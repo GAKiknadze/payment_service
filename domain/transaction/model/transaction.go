@@ -23,7 +23,7 @@ type Transaction struct {
 	organization    valueobjects.OrganizationID
 	amount          valueobjects.Money
 	transactionType vo.TransactionType
-	status          TransactionStatus
+	status          vo.TransactionStatus
 	idempotencyKey  valueobjects.IdempotencyKey
 	createdAt       valueobjects.DateTime
 	completedAt     *valueobjects.DateTime
@@ -56,7 +56,7 @@ func NewTransaction(
 		organization:    orgID,
 		amount:          amount,
 		transactionType: txType,
-		status:          NewTransactionStatus(StatusPending),
+		status:          vo.NewTransactionStatus(vo.StatusPending),
 		idempotencyKey:  idempotencyKey,
 		createdAt:       now,
 		version:         1,
@@ -76,13 +76,13 @@ func NewTransaction(
 
 // Complete завершает транзакцию с проверкой бизнес-правил
 func (t *Transaction) Complete(clock interfaces.Clock) error {
-	if !t.status.CanTransitionTo(StatusCompleted) {
+	if !t.status.CanTransitionTo(vo.StatusCompleted) {
 		return ErrInvalidStatusTransition
 	}
 
 	now := valueobjects.NewDateTime(clock.Now())
 	t.completedAt = &now
-	t.status = NewTransactionStatus(StatusCompleted)
+	t.status = vo.NewTransactionStatus(vo.StatusCompleted)
 	t.version++
 
 	// Генерация доменного события
@@ -96,12 +96,12 @@ func (t *Transaction) Complete(clock interfaces.Clock) error {
 
 // Fail помечает транзакцию как неудачную
 func (t *Transaction) Fail(reason string, clock interfaces.Clock) error {
-	if !t.status.CanTransitionTo(StatusFailed) {
+	if !t.status.CanTransitionTo(vo.StatusFailed) {
 		return ErrInvalidStatusTransition
 	}
 
 	now := valueobjects.NewDateTime(clock.Now())
-	t.status = NewTransactionStatus(StatusFailed)
+	t.status = vo.NewTransactionStatus(vo.StatusFailed)
 	t.version++
 
 	// Генерация доменного события
@@ -119,7 +119,7 @@ func (t *Transaction) Compensate(
 	id valueobjects.TransactionID,
 	clock interfaces.Clock,
 ) (*Transaction, error) {
-	if t.status.Value() != StatusCompleted {
+	if t.status.Value() != vo.StatusCompleted {
 		return nil, errors.New("can only compensate completed transactions")
 	}
 
@@ -137,7 +137,7 @@ func (t *Transaction) Compensate(
 	}
 
 	// Помечаем исходную транзакцию как компенсированную
-	t.status = NewTransactionStatus(StatusCompensated)
+	t.status = vo.NewTransactionStatus(vo.StatusCompensated)
 	t.version++
 
 	// Генерация доменных событий
@@ -167,12 +167,12 @@ func (t *Transaction) ValidateIdempotency(key valueobjects.IdempotencyKey) error
 
 // CanBeCompleted проверяет, может ли транзакция быть завершена
 func (t *Transaction) CanBeCompleted() bool {
-	return t.status.CanTransitionTo(StatusCompleted)
+	return t.status.CanTransitionTo(vo.StatusCompleted)
 }
 
 // IsCompleted проверяет, завершена ли транзакция
 func (t *Transaction) IsCompleted() bool {
-	return t.status.Value() == StatusCompleted
+	return t.status.Value() == vo.StatusCompleted
 }
 
 // ID возвращает идентификатор транзакции
@@ -191,7 +191,7 @@ func (t *Transaction) Amount() valueobjects.Money {
 }
 
 // Status возвращает текущий статус
-func (t *Transaction) Status() TransactionStatus {
+func (t *Transaction) Status() vo.TransactionStatus {
 	return t.status
 }
 

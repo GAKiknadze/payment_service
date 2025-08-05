@@ -1,4 +1,4 @@
-package model
+package valueobjects
 
 // Состояния транзакции
 const (
