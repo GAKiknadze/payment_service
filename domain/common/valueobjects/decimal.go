@@ -6,7 +6,7 @@ import (
 
 // NewDecimal создает Decimal из float64 с безопасным преобразованием
 func NewDecimal(value float64) decimal.Decimal {
-	return decimal.NewFromFloatWithExponent(value, -2)
+	return decimal.NewFromFloat(value).RoundBank(2)
 }
 
 // NewDecimalFromInt создает Decimal из целого числа
