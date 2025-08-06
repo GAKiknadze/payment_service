@@ -6,36 +6,25 @@ import (
 )
 
 const (
-	alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 )
+
+var alphabetSize = big.NewInt(int64(len(Alphabet)))
 
 // GenerateShortID генерирует короткий идентификатор заданной длины
 // Использует криптографически безопасный генератор
 // Пример: для length=8 -> "A1B2C3D4"
 func GenerateShortID(length int) string {
-	result := make([]byte, length)
-	alphabetSize := big.NewInt(int64(len(alphabet)))
-
-	for i := 0; i < length; i++ {
-		// Получаем безопасное случайное число в диапазоне алфавита
+	if length < 0 {
+		panic("idgen: negative length requested")
+	}
+	id := make([]byte, length)
+	for i := range id {
 		num, err := rand.Int(rand.Reader, alphabetSize)
 		if err != nil {
-			// В реальном приложении здесь должна быть обработка ошибки
-			return fallbackShortID(length)
+			panic("idgen: failure: " + err.Error())
 		}
-		result[i] = alphabet[num.Int64()]
+		id[i] = Alphabet[num.Int64()]
 	}
-
-	return string(result)
-}
-
-// fallbackShortID используется при неудаче с crypto/rand
-func fallbackShortID(length int) string {
-	// В реальном приложении здесь должна быть более надежная реализация
-	// или panic с логированием критической ошибки
-	result := make([]byte, length)
-	for i := range result {
-		result[i] = 'X'
-	}
-	return string(result)
+	return string(id)
 }
