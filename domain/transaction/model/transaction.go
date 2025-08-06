@@ -127,7 +127,7 @@ func (t *Transaction) Compensate(
 	compensation, err := NewTransaction(
 		id,
 		t.organization,
-		t.amount.Negate(),
+		t.amount,
 		reverseTransactionType(t.transactionType),
 		t.idempotencyKey,
 		clock,
@@ -149,7 +149,7 @@ func (t *Transaction) Compensate(
 	compensation.events = append(compensation.events, event.TransactionCreated{
 		TransactionID:   id,
 		OrganizationID:  t.organization,
-		Amount:          t.amount.Negate(),
+		Amount:          t.amount,
 		TransactionType: reverseTransactionType(t.transactionType),
 		Timestamp:       valueobjects.NewDateTime(clock.Now()),
 	})
@@ -193,6 +193,26 @@ func (t *Transaction) Amount() valueobjects.Money {
 // Status возвращает текущий статус
 func (t *Transaction) Status() vo.TransactionStatus {
 	return t.status
+}
+
+// TransactionType возвращает тип транзакции
+func (t *Transaction) TransactionType() vo.TransactionType {
+	return t.transactionType
+}
+
+// CreatedAt возвращает дату и время создания транзакции
+func (t *Transaction) CreatedAt() valueobjects.DateTime {
+	return t.createdAt
+}
+
+// CompletedAt возвращает дату и время завершения транзакции
+func (t *Transaction) CompletedAt() *valueobjects.DateTime {
+	return t.completedAt
+}
+
+// CompletedAt возвращает версию транзакции
+func (t *Transaction) Version() int {
+	return t.version
 }
 
 // PopEvents извлекает и сбрасывает буфер доменных событий
