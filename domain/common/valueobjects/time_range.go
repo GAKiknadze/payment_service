@@ -47,7 +47,7 @@ func (tr TimeRange) Duration() time.Duration {
 
 // Contains проверяет, содержит ли интервал указанный момент
 func (tr TimeRange) Contains(moment DateTime) bool {
-	return moment.After(tr.start) && moment.Before(tr.end)
+	return moment.Equals(tr.start) || moment.Equals(tr.end) || moment.After(tr.start) && moment.Before(tr.end)
 }
 
 // Equals сравнивает два временных интервала

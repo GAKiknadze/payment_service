@@ -8,6 +8,7 @@ import (
 	"github.com/GAKiknadze/payment_service/domain/common/utils"
 	"github.com/GAKiknadze/payment_service/domain/common/valueobjects"
 	"github.com/GAKiknadze/payment_service/domain/tariff/event"
+	"github.com/shopspring/decimal"
 )
 
 var (
@@ -71,29 +72,52 @@ func (t *Tariff) UpdatePrice(
 		return errors.New("cannot set price for past dates")
 	}
 
+	oldPrice := t.price
+
+	t.price = newPrice
+
 	// Генерация доменного события
 	t.events = append(t.events, event.TariffPriceUpdated{
 		TariffID:      t.id,
-		OldPrice:      t.price,
+		OldPrice:      oldPrice,
 		NewPrice:      newPrice,
 		EffectiveDate: effectiveDate,
 	})
 
-	t.price = newPrice
 	t.version++
 	return nil
 }
 
 // CalculateCost вычисляет стоимость за указанный период
 func (t *Tariff) CalculateCost(duration time.Duration) (valueobjects.Money, error) {
+	// if duration < 0 {
+	// 	return valueobjects.Money{}, valueobjects.ErrInvalidBillingPeriod
+	// }
+
+	// hours := duration.Hours()
+
+	// if math.Abs(hours-730) < 0.001 {
+	// 	return t.price, nil
+	// }
+
+	// numerator := t.price.Amount().Mul(decimal.NewFromFloat(hours))
+	// result := numerator.Div(decimal.NewFromInt(730))
+	// return valueobjects.MustMoney(result, t.Price().Currency()), nil
+
 	if duration < 0 {
-		return valueobjects.Money{}, errors.New("duration cannot be negative")
+		return valueobjects.Money{}, valueobjects.ErrInvalidBillingPeriod
 	}
 
-	// Бизнес-логика расчета (например, пропорционально времени)
-	hours := duration.Hours()
-	hourlyRate, _ := t.price.Divide(valueobjects.NewDecimal(730)) // 730 часов в месяце
-	cost, _ := hourlyRate.Multiply(valueobjects.NewDecimal(hours))
+	totalHours := t.period.Duration().Hours()
+
+	if totalHours <= 0 {
+		return valueobjects.Money{}, errors.New("tariff period must have positive duration")
+	}
+
+	ratio := duration.Hours() / totalHours
+
+	// Стоимость = цена тарифа * доля периода
+	cost, _ := t.price.Multiply(decimal.NewFromFloat(ratio))
 	return cost, nil
 }
 
@@ -102,4 +126,29 @@ func (t *Tariff) PopEvents() []interface{} {
 	events := t.events
 	t.events = nil
 	return events
+}
+
+// ID возвращает идентификатор тарифа
+func (t *Tariff) ID() valueobjects.TariffID {
+	return t.id
+}
+
+// Name возвращает название тарифа
+func (t *Tariff) Name() string {
+	return t.name
+}
+
+// Price возвращает цена тарифа
+func (t *Tariff) Price() valueobjects.Money {
+	return t.price
+}
+
+// Period возвращает период действия тарифа
+func (t *Tariff) Period() valueobjects.TimeRange {
+	return t.period
+}
+
+// Version возвращает номер версии тарифа
+func (t *Tariff) Version() int {
+	return t.version
 }

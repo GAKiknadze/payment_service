@@ -145,12 +145,12 @@ func TestTimeRange_Contains(t *testing.T) {
 		{
 			name:     "Moment at start",
 			moment:   start,
-			contains: false, // Contains не включает начало интервала
+			contains: true,
 		},
 		{
 			name:     "Moment at end",
 			moment:   end,
-			contains: false, // Contains не включает конец интервала
+			contains: true,
 		},
 		{
 			name:     "Moment before start",
@@ -243,8 +243,8 @@ func TestTimeRange_UTCNormalization(t *testing.T) {
 	moscow, _ := time.LoadLocation("Europe/Moscow")
 	ny, _ := time.LoadLocation("America/New_York")
 
-	moscowTime := time.Date(2023, 5, 15, 10, 30, 0, 0, moscow)
-	nyTime := time.Date(2023, 5, 15, 6, 30, 0, 0, ny) // То же время в UTC
+	moscowTime := time.Date(2025, 5, 15, 10, 30, 0, 0, moscow)
+	nyTime := time.Date(2025, 5, 15, 6, 30, 0, 0, ny) // То же время в UTC
 
 	// Создаем TimeRange с временем в разных временных зонах
 	timeRange, err := valueobjects.NewTimeRange(moscowTime, nyTime.Add(1*time.Hour))
@@ -323,12 +323,12 @@ func TestTimeRange_ContainsEdgeCases(t *testing.T) {
 		{
 			name:     "Exactly at start",
 			moment:   start,
-			contains: false,
+			contains: true,
 		},
 		{
 			name:     "Exactly at end",
 			moment:   end,
-			contains: false,
+			contains: true,
 		},
 		{
 			name:     "One nanosecond after start",

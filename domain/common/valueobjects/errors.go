@@ -11,4 +11,6 @@ var (
 	ErrDivisionByZero = errors.New("division by zero")
 	// ErrInvalidDate
 	ErrInvalidDate = errors.New("ivalid date")
+	// ErrInvalidBillingPeriod ошибка отрицательного периода
+	ErrInvalidBillingPeriod = errors.New("billing period must be positive")
 )

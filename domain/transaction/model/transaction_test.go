@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/GAKiknadze/payment_service/domain/common/valueobjects"
+	"github.com/GAKiknadze/payment_service/domain/common/valueobjects/fixtures"
 	mocks "github.com/GAKiknadze/payment_service/domain/common/valueobjects/mocks"
 	"github.com/GAKiknadze/payment_service/domain/transaction/event"
 	"github.com/GAKiknadze/payment_service/domain/transaction/model"
@@ -20,7 +21,7 @@ func TestTransaction_NewTransaction(t *testing.T) {
 	// Настройка тестовых данных
 	testTime := time.Date(2025, 10, 1, 12, 0, 0, 0, time.UTC)
 	testOrgID := valueobjects.GenerateOrganizationID()
-	validAmount, _ := valueobjects.NewMoney(valueobjects.NewDecimal(100.00), valueobjects.RUB) // 100.00
+	validAmount := fixtures.NewTestMoneyRUB(100.00) // 100.00
 
 	// Настройка мока времени
 	mockClock := mocks.NewFixedClock(testTime)
@@ -79,11 +80,10 @@ func TestTransaction_NewTransaction(t *testing.T) {
 
 	t.Run("zero amount returns error", func(t *testing.T) {
 		idempotencyKey, _ := valueobjects.NewIdempotencyKey("key-123")
-		money, _ := valueobjects.NewMoney(valueobjects.NewDecimalFromInt(0), valueobjects.RUB)
 		tx, err := model.NewTransaction(
 			valueobjects.GenerateTransactionID(),
 			testOrgID,
-			money,
+			fixtures.NewTestMoneyRUB(0),
 			vo.TransactionTypeDebit,
 			idempotencyKey,
 			mockClock,
@@ -113,8 +113,7 @@ func TestTransaction_NewTransaction(t *testing.T) {
 func TestTransaction_StatusTransitions(t *testing.T) {
 	testTime := time.Date(2025, 10, 1, 12, 0, 0, 0, time.UTC)
 	mockClock := mocks.NewFixedClock(testTime)
-
-	validAmount, _ := valueobjects.NewMoney(valueobjects.NewDecimalFromInt(10000), valueobjects.RUB)
+	validAmount := fixtures.NewTestMoneyRUB(10000)
 	testOrgID := valueobjects.GenerateOrganizationID()
 	idempotencyKey, _ := valueobjects.NewIdempotencyKey("key-123")
 
@@ -196,7 +195,7 @@ func TestTransaction_Compensation(t *testing.T) {
 	testTime := time.Date(2025, 10, 1, 12, 0, 0, 0, time.UTC)
 	mockClock := mocks.NewFixedClock(testTime)
 
-	validAmount, _ := valueobjects.NewMoney(valueobjects.NewDecimalFromInt(10000), valueobjects.RUB)
+	validAmount := fixtures.NewTestMoneyRUB(10000)
 	testOrgID := valueobjects.GenerateOrganizationID()
 	idempotencyKey, _ := valueobjects.NewIdempotencyKey("key-123")
 
@@ -259,7 +258,7 @@ func TestTransaction_Idempotency(t *testing.T) {
 	testTime := time.Date(2025, 10, 1, 12, 0, 0, 0, time.UTC)
 	mockClock := mocks.NewFixedClock(testTime)
 
-	validAmount, _ := valueobjects.NewMoney(valueobjects.NewDecimalFromInt(10000), valueobjects.RUB)
+	validAmount := fixtures.NewTestMoneyRUB(10000)
 	testOrgID := valueobjects.GenerateOrganizationID()
 
 	t.Run("valid idempotency key", func(t *testing.T) {
@@ -313,7 +312,7 @@ func TestTransaction_DomainEvents(t *testing.T) {
 	testTime := time.Date(2025, 10, 1, 12, 0, 0, 0, time.UTC)
 	mockClock := mocks.NewFixedClock(testTime)
 
-	validAmount, _ := valueobjects.NewMoney(valueobjects.NewDecimalFromInt(10000), valueobjects.RUB)
+	validAmount := fixtures.NewTestMoneyRUB(10000)
 	testOrgID := valueobjects.GenerateOrganizationID()
 	idempotencyKey, _ := valueobjects.NewIdempotencyKey("key-123")
 

@@ -3,6 +3,7 @@ package valueobjects
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/shopspring/decimal"
 )
@@ -11,6 +12,8 @@ var (
 	ErrInvalidMoneyValue = errors.New("invalid money value: must be non-negative")
 	ErrCurrencyMismatch  = errors.New("currency mismatch in money operation")
 )
+
+const scale = 10000
 
 // Money представляет денежную сумму с точностью до копеек
 // Value Object: неизменяемый, сравнивается по значению
@@ -81,6 +84,15 @@ func (m Money) IsNegative() bool {
 // Equals сравнивает два Money по значению и валюте
 func (m Money) Equals(other Money) bool {
 	return m.currency == other.currency && m.amount.Equal(other.amount)
+}
+
+// IsApproximatelyEqual проверяет, равны ли два денежных значения с учетом допустимой погрешности
+func (m Money) IsApproximatelyEqual(other Money, epsilon float64) bool {
+	epsilonStr := strconv.FormatFloat(epsilon, 'f', -1, 64)
+	epsilonDecimal, _ := decimal.NewFromString(epsilonStr)
+
+	diff := m.amount.Sub(other.amount).Abs()
+	return diff.Cmp(epsilonDecimal) <= 0
 }
 
 // LessThan
