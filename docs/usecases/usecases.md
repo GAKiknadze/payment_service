@@ -1,141 +1,106 @@
-# Сервис оплаты: Окончательный список функций
-
-## Оглавление
-1. [OrganizationAppService](#organizationappservice)
-2. [SubscriptionAppService](#subscriptionappservice)
-3. [TariffAppService](#tariffappservice)
-4. [BillingAppService](#billingappservice)
-5. [QuotaAppService](#quotaappservice)
-
----
-
-## OrganizationAppService
-*Управление организациями с разделением прав доступа между пользователями и администраторами.*
-
-### **Управление организациями**
-- [**CreateOrganization**](./organization.md#createorganization)  
-  Создание новой организации с фиксированной валютой (владелец может создать только одну организацию).
-
-- [**GetOrganization**](./organization.md#getorganization)  
-  Получение данных об организации (владелец видит только свою, администратор — любую).
-
-- [**UpdateOrganization**](./organization.md#updateorganization)  
-  Обновление данных организации (владелец — только название, администратор — все поля кроме валюты).
-
-- [**DeleteOrganization**](./organization.md#deleteorganization)  
-  Удаление организации (владелец — при нулевом балансе и отсутствии подписок, администратор — с принудительным удалением).
-
-### **Управление балансом**
-- [**TopUpBalance**](./organization.md#topupbalance)  
-  Ручное пополнение баланса организации владельца.
-
-- [**UpdateAutoTopUpSettings**](./organization.md#updateautotopupsettings)  
-  Настройка параметров автопополнения (активация, сумма пополнения, платежный метод).
-
-- [**ManagePaymentMethods**](./organization.md#managepaymentmethods)  
-  Добавление и удаление платежных методов для организации.
-
-- [**GetQuotaUsage**](./organization.md#getquotausage)  
-  Просмотр текущего использования квот по всем ресурсам.
-
----
-
-## SubscriptionAppService
-*Управление подписками и тарифами с поддержкой апгрейда, даунгрейда и отмены.*
-
-### **Управление подписками**
-- [**GetActiveSubscription**](./subscription.md#getactivesubscription)  
-  Получение списка активных подписок организации.
-
-- [**CreateSubscription**](./subscription.md#createsubscription)  
-  Подключение нового тарифа с предварительной оплатой.
-
-- [**ConfirmSubscriptionPayment**](./subscription.md#confirmsubscriptionpayment)  
-  Подтверждение оплаты и активация подписки после успешного платежа.
-
-- [**CancelSubscription**](./subscription.md#cancelsubscription)  
-  Отмена активной подписки с расчетом возврата средств по выбранной политике.
-
-- [**UpgradeSubscription**](./subscription.md#upgradesubscription)  
-  Смена тарифа на более дорогой с немедленным списанием разницы.
-
-- [**DowngradeSubscription**](./subscription.md#downgradesubscription)  
-  Смена тарифа на более дешевый с применением изменений с даты следующего списания.
-
-- [**ExtendSubscription**](./subscription.md#extendsubscription)  
-  Продление разовой подписки (например, SSL-сертификата).
-
----
-
-## TariffAppService
-*Управление тарифами (только для администратора).*
-
-### **Управление тарифами**
-- [**GetTariffsList**](./tariff.md#gettariffslist)  
-  Получение списка активных тарифов (с опцией включения архивных).
-
-- [**GetTariff**](./tariff.md#gettariff)  
-  Получение детальной информации о тарифе.
-
-- [**CreateTariff**](./tariff.md#createtariff)  
-  Создание нового тарифа с ценами в разных валютах и лимитами ресурсов.
-
-- [**UpdateTariff**](./tariff.md#updatetariff)  
-  Обновление параметров тарифа (название, описание, цены, квоты).
-
-- [**AddPriceToTariff**](./tariff.md#addpricetotariff)  
-  Добавление цены в новой валюте к существующему тарифу.
-
-- [**RemovePriceFromTariff**](./tariff.md#removepricefromtariff)  
-  Удаление цены в определенной валюте из тарифа.
-
-- [**ArchiveTariff**](./tariff.md#archivetariff)  
-  Архивирование тарифа (запрет на новые подключения).
-
----
+# Оглавление функционала системы
 
 ## BillingAppService
-*Управление платежами и биллингом (администратор и системные процессы).*
+Управление платежами, списаниями и финансовой отчетностью.
 
-### **Платежные операции**
-- [**ProcessScheduledBilling**](./billing.md#processscheduledbilling)  
-  Автоматическое списание средств по расписанию для всех активных подписок.
+- [**ProcessScheduledBilling**](./billing.md#processscheduledbilling)
+Запуск фонового процесса списания средств по расписанию. Автоматически обрабатывает подписки, где дата следующего списания наступила или прошла. Может запускаться системой по расписанию или администратором вручную.
 
-- [**TriggerAutoTopUp**](./billing.md#triggerautotopup)  
-  Принудительный запуск автопополнения для тестирования.
+- [**TriggerAutoTopUp**](./billing.md#triggerautotopup)
+Принудительный запуск автопополнения баланса для тестирования или ручного срабатывания. Проверяет порог баланса и при необходимости создает платеж для пополнения.
 
-- [**GetPaymentHistory**](./billing.md#getpaymenthistory)  
-  Получение истории платежей с фильтрацией по организации, периоду и типу.
+- [**GetPaymentHistory**](./billing.md#getpaymenthistory)
+Получение истории платежей с возможностью фильтрации по организации, типу платежа, статусу и периоду. Доступно пользователю для своей организации и администратору для всех организаций.
 
-- [**GenerateBillingReport**](./billing.md#generatebillingreport)  
-  Генерация финансовых отчетов за заданный период.
+- [**GenerateBillingReport**](./billing.md#generatebillingreport)
+Генерация финансового отчета за указанный период в различных форматах (PDF, CSV, Excel). Позволяет анализировать выручку и транзакции.
 
-- [**ManualCharge**](./billing.md#manualcharge)  
-  Ручное списание средств за разовое использование ресурса.
+- [**ManualCharge**](./billing.md#manualcharge)
+Ручное списание средств за разовое использование ресурса (например, SSL-сертификат). Выполняется администратором с проверкой квот и баланса.
 
-- [**RetryFailedPayment**](./billing.md#retryfailedpayment)  
-  Повторная попытка обработки неудачного платежа.
+- [**RetryFailedPayment**](./billing.md#retryfailedpayment)
+Повторная попытка списания для неудачного платежа. Позволяет администратору обойти временные проблемы с платежным шлюзом.
 
-- [**TopUpBalance**](./organization.md#topupbalance)  
-  Ручное пополнение баланса (дублируется из OrganizationAppService для администратора).
+## OrganizationAppService
+Управление организациями, балансом и платежными методами.
 
----
+- [**CreateOrganization**](./organization.md#createorganization)
+Создание новой организации с фиксированной валютой. Ограничение: одна организация на владельца. Включает настройки автопополнения по умолчанию.
+
+- [**GetOrganization**](./organization.md#getorganization)
+Получение данных об организации. Пользователь видит только свою организацию, администратор - любую по идентификатору.
+
+- [**UpdateOrganization**](./organization.md#updateorganization)
+Обновление данных организации. Пользователь может менять только название, администратор - все параметры кроме валюты.
+
+- [**DeleteOrganization**](./organization.md#deleteorganization)
+Удаление организации. Пользователь может удалить только свою организацию без активных подписок и долгов, администратор - принудительно с отменой подписок и возвратом средств.
+
+- [**UpdateAutoTopUpSettings**](./organization.md#updateautotopupsettings)
+Настройка автопополнения баланса. Владелец организации может активировать автопополнение, установить сумму и платежный метод.
+
+- [**TopUpBalance**](./organization.md#topupbalance)
+Ручное пополнение баланса организации через указанный платежный метод. Доступно только владельцу организации.
+
+- [**ManagePaymentMethods**](./organization.md#managepaymentmethods)
+Управление платежными методами (добавление и удаление). Включает проверку валидности и защиту от удаления метода, используемого в автопополнении.
+
+- [**GetQuotaUsage**](./organization.md#getquotausage)
+Просмотр текущего использования квот по организации. Доступно пользователю для своей организации и администратору для всех.
 
 ## QuotaAppService
-*Управление квотами и лимитами ресурсов (автоматизировано и доступно для диагностики).*
+Управление квотами и лимитами использования ресурсов.
 
-### **Контроль использования ресурсов**
-- [**CheckQuotaUsage**](./quota.md#checkquotausage)  
-  Проверка возможности использования ресурса с учетом текущих квот.
+- [**CheckQuotaUsage**](./quota.md#checkquotausage)
+Проверка возможности использования ресурса перед выполнением операции. Проверяет текущее использование квоты и наличие средств.
 
-- [**IncrementUsage**](./quota.md#incrementusage)  
-  Увеличение использования квоты при выполнении операции (вызывается системой автоматически).
+- [**IncrementUsage**](./quota.md#incrementusage)
+Увеличение использования квоты при выполнении операции. Автоматически вызывается системой после успешной проверки квоты.
 
-- [**ResetQuotaUsage**](./quota.md)  
-  Сброс использования квоты при начале нового биллингового периода.
+## SubscriptionAppService
+Управление подписками на тарифные планы.
 
-- [**GetQuotaLimits**](./quota.md) 
-  Получение лимитов квот для всех активных подписок организации.
+- [**GetActiveSubscription**](./subscription.md#getactivesubscription)
+Получение списка активных подписок. Пользователь видит только свои, администратор - по указанной организации.
 
-- [**AdjustQuotaManually**](./quota.md)  
-  Ручная корректировка использования квоты (только для администратора при ошибках системы).
+- [**CreateSubscription**](./subscription.md#createsubscription)
+Подключение тарифа к организации. Проверяет валюту, статус тарифа и баланс перед созданием подписки.
+
+- [**ConfirmSubscriptionPayment**](./subscription.md#confirmsubscriptionpayment)
+Подтверждение оплаты и активация подписки. Изменяет статус подписки на Active и инициализирует квоты.
+
+- [**CancelSubscription**](./subscription.md#cancelsubscription)
+Отмена активной подписки с возвратом средств за неиспользованный период согласно выбранной политике возврата.
+
+- [**UpgradeSubscription**](./subscription.md#upgradesubscription)
+Смена тарифа на более дорогой с немедленным списанием разницы. Поддерживает два типа перерасчета: немедленный и с даты следующего списания.
+
+- [**DowngradeSubscription**](./subscription.md#downgradesubscription)
+Смена тарифа на более дешевый с эффектом с даты следующего списания. Не требует немедленной оплаты.
+
+- [**ExtendSubscription**](./subscription.md#extendsubscription)
+Продление разовой подписки (например, SSL-сертификата). Создает новую подписку на указанный период.
+
+## TariffAppService
+Управление тарифными планами системы.
+
+- [**GetTariffsList**](./tariff.md#gettariffslist)
+Получение списка тарифов с возможностью фильтрации по статусу и типу списания. Поддерживает пагинацию и поиск.
+
+- [**GetTariff**](./tariff.md#gettariff)
+Получение деталей тарифа, включая историю изменений и количество активных подписок.
+
+- [**UpdateTariff**](./tariff.md#updatetariff)
+Обновление тарифа с управлением версиями. Критические изменения требуют подтверждения при наличии активных подписок.
+
+- [**ArchiveTariff**](./tariff.md#archivetariff)
+Архивирование тарифа (запрет подключения новых подписок). Требует отсутствия активных подписок на тариф.
+
+- [**CreateTariff**](./tariff.md#createtariff)
+Создание нового тарифа с указанием цен, квот и типа списания. Генерирует уникальный идентификатор тарифа.
+
+- [**AddPriceToTariff**](./tariff.md#addpricetotariff)
+Добавление цены в новой валюте к существующему тарифу. Проверяет уникальность валюты и статус тарифа.
+
+- [**RemovePriceFromTariff**](./tariff.md#removepricefromtariff)
+Удаление цены в определенной валюте из тарифа. Защищает от удаления единственной валюты.
