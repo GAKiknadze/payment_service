@@ -117,3 +117,11 @@ func (m MoneyAmount) CanCover(other MoneyAmount) (bool, error) {
 
 	return m.amount.Cmp(other.amount) >= 0, nil
 }
+
+// Для тестов в обход проверок
+func NewMoneyAmountForTest(amount decimal.Decimal, currency Currency) MoneyAmount {
+	return MoneyAmount{
+		amount:   amount,
+		currency: currency,
+	}
+}
