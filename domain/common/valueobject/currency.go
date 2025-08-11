@@ -12,6 +12,7 @@ type CurrencyType string
 
 const (
 	CurrencyRUB CurrencyType = "RUB"
+	CurrencyKZT CurrencyType = "KZT"
 )
 
 var ErrUnsupportedCurrencyType = errors.New("unsupported currency type")
@@ -33,6 +34,13 @@ func NewCurrency(currencyType CurrencyType) (Currency, error) {
 			symbol:        "₽",
 			decimalPlaces: 2,
 			isSupported:   true,
+		}, nil
+	case CurrencyKZT:
+		return Currency{
+			code:          CurrencyKZT,
+			symbol:        "₸",
+			decimalPlaces: 2,
+			isSupported:   false,
 		}, nil
 	default:
 		return Currency{}, ErrUnsupportedCurrencyType
