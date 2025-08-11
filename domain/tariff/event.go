@@ -7,44 +7,55 @@ import (
 )
 
 type EventTariffCreated struct {
-	tariffID     common.TariffID
-	name         string
-	description  *string
-	billingCycle string
-	prices       []common.Price
-	quotas       []common.QuotaDefinition
-	createdAt    time.Time
+	TariffID     common.TariffID
+	Name         string
+	Description  *string
+	BillingCycle string
+	Prices       []common.Price
+	Quotas       []common.QuotaDefinition
+	CreatedAt    time.Time
 }
 
 type EventTariffUpdated struct {
-	tariffID             common.TariffID
-	oldVersion           uint
-	newVersion           uint
-	changedFields        []interface{}
-	updatedAt            time.Time
-	requiresNotification bool
+	TariffID             common.TariffID
+	ChangedFields        []string
+	UpdatedAt            time.Time
+	RequiresNotification bool
+	NewVersion           uint
 }
 
 type EventTariffArchived struct {
-	tariffID                 common.TariffID
-	archivedAt               time.Time
-	reason                   *string
-	deprecationDate          time.Time
-	activeSubscriptionsCount uint
+	TariffID                 common.TariffID
+	ArchivedAt               time.Time
+	Reason                   *string
+	DeprecationDate          time.Time
+	ActiveSubscriptionsCount uint
+	NewVersion               uint
 }
 
 type EventPriceAdded struct {
-	tariffID  common.TariffID
-	currency  string
-	amount    string
-	isDefault bool
-	addedAt   time.Time
+	TariffID   common.TariffID
+	Currency   string
+	Amount     string
+	IsDefault  bool
+	AddedAt    time.Time
+	NewVersion uint
 }
 
 type EventPriceRemoved struct {
-	tariffID           common.TariffID
-	currency           string
-	wasDefault         bool
-	newDefaultCurrency string
-	removedAt          time.Time
+	TariffID           common.TariffID
+	Currency           string
+	Price              common.Price
+	WasDefault         bool
+	NewDefaultCurrency string
+	RemovedAt          time.Time
+	NewVersion         uint
+}
+
+type EventQuotasUpdated struct {
+	TariffID   common.TariffID
+	OldQuotas  []common.QuotaDefinition
+	NewQuotas  []common.QuotaDefinition
+	UpdatedAt  time.Time
+	NewVersion uint
 }
