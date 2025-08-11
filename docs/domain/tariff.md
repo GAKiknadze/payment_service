@@ -37,7 +37,7 @@
 - `billingCycle` Тип списания
 - `prices` Цены в различных валютах
 - `quotas` Лимиты ресурсов
-- `creationTime` Время создания
+- `createdAt` Время создания
 
 **Используется для:**
 - Отправки уведомления о новом тарифе пользователям
@@ -56,7 +56,7 @@
 - `oldVersion` Предыдущая версия тарифа
 - `newVersion` Новая версия тарифа
 - `changedFields` Измененные поля
-- `updateTime` Время обновления
+- `updatedAt` Время обновления
 - `requiresNotification` Требуется ли уведомление пользователей
 
 **Используется для:**
@@ -73,7 +73,7 @@
 
 **Данные события:**
 - `tariffID` Идентификатор тарифа
-- `archivedTime` Время архивации
+- `archivedAt` Время архивации
 - `reason` Причина архивации
 - `deprecationDate` Дата окончания поддержки
 - `activeSubscriptionsCount` Количество активных подписок
@@ -95,7 +95,7 @@
 - `currency` Добавленная валюта
 - `amount` Сумма
 - `isDefault` Сделана ли валютой по умолчанию
-- `addTime` Время добавления
+- `addedAt` Время добавления
 
 **Используется для:**
 - Обновления отображения тарифа для пользователей в новой валюте
@@ -114,7 +114,7 @@
 - `currency` Удаленная валюта
 - `wasDefault` Была ли валютой по умолчанию
 - `newDefaultCurrency` Новая валюта по умолчанию
-- `removeTime` Время удаления
+- `removedAt` Время удаления
 
 **Используется для:**
 - Обновления отображения тарифа
@@ -126,14 +126,14 @@
 
 ### ITariffRepository
 
-#### Create(tariff *Tariff) (string, error)
+#### Create(tariff *Tariff) (TariffID, error)
 Создает новый тариф в системе.
 
 **Входные параметры:**
 - `tariff` Указатель на агрегат Tariff
 
 **Выходные параметры:**
-- `string` Идентификатор созданного тарифа
+- `TariffID` Идентификатор созданного тарифа
 - `error` Ошибка создания (например, TariffNameExistsError)
 
 #### GetByID(tariffID string) (*Tariff, error)
@@ -178,7 +178,7 @@
 **Выходные параметры:**
 - `error` Ошибка обновления (например, ActiveSubscriptionsConflictError)
 
-#### Archive(tariffID string, archivedAt time.Time) error
+#### Archive(tariffID TariffID, archivedAt time.Time) error
 Помечает тариф как архивный.
 
 **Входные параметры:**
@@ -188,7 +188,7 @@
 **Выходные параметры:**
 - `error` Ошибка архивации (например, ActiveSubscriptionsError)
 
-#### HasActiveSubscriptions(tariffID string) (bool, error)
+#### HasActiveSubscriptions(tariffID TariffID) (bool, error)
 Проверяет наличие активных подписок на тариф.
 
 **Входные параметры:**
@@ -198,7 +198,7 @@
 - `bool` true, если есть активные подписки
 - `error` Ошибка проверки
 
-#### GetPriceByCurrency(tariffID string, currency string) (*Price, error)
+#### GetPriceByCurrency(tariffID TariffID, currency string) (*Price, error)
 Получает цену тарифа в указанной валюте.
 
 **Входные параметры:**

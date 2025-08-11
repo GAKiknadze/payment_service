@@ -42,10 +42,16 @@
 *Периодичность списания средств для подписок.*
 
 **Содержит:**
-- `type` Тип периодичности (`Hourly`, `Monthly`, `OneTime`)
-- `duration` Продолжительность цикла в днях
+- `cycleType` Тип периодичности (`Hourly`, `Monthly`, `OneTime`)
 - `isRecurring` Является ли цикл повторяющимся
 - `displayName` Отображаемое название (например, "Ежемесячно")
+
+**Методы:**
+- `NewBillingCycle (cycleType BillingCycleType) (BillingCycle, error)` Фабричный метод для создания BillingCycle
+- `CalculateNextBillingDate(currentDate time.Time) (time.Time, error)` Метод для расчета следующей даты списания
+
+**Возможные ошибки:**
+- `ErrUnsupportedBillingCycleType` Тип периодичности не поддерживается
 
 **Используется в:**
 - Tariff Domain (описание тарифа)
