@@ -48,6 +48,10 @@ func NewBillingCycle(cycleType BillingCycleType) (BillingCycle, error) {
 	}
 }
 
+func (bc BillingCycle) Type() BillingCycleType {
+	return bc.cycleType
+}
+
 // CalculateNextBillingDate - метод для расчета следующей даты списания
 // Учитывает особенности календаря (разное количество дней в месяцах)
 func (bc BillingCycle) CalculateNextBillingDate(currentDate time.Time) (time.Time, error) {
